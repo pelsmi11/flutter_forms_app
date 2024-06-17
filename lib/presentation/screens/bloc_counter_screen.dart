@@ -1,29 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:forms_app/presentation/blocs/counter_bloc/counter_bloc.dart';
 
 class BlocCounterScreen extends StatelessWidget {
   const BlocCounterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => CounterBloc(),
+      child: BlocCounterView(),
+    );
+  }
+}
+
+class BlocCounterView extends StatelessWidget {
+  void encreasedCounterBy(BuildContext context, [int value = 1]) {
+    // example whitout funtion in bloc
+    // context.read<CounterBloc>().add(CounterIncreased(value));
+    context.read<CounterBloc>().increasedBy();
+  }
+
+  const BlocCounterView({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('bloc Counter'),
+        title: context.select((CounterBloc counterBloc) =>
+            Text('bloc Counter ${counterBloc.state.transactionCount}')),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: () {},
+            onPressed: () {
+              context.read<CounterBloc>().resetCounter();
+            },
           ),
         ],
       ),
-      body: const Center(
-        child: Text("Counter Value: "),
+      body: Center(
+        child: context.select((CounterBloc counterBloc) =>
+            Text("Counter Value: ${counterBloc.state.counter}")),
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
             heroTag: '1',
-            onPressed: () => {},
+            onPressed: () => {encreasedCounterBy(context, 3)},
             child: const Text('+3'),
           ),
           const SizedBox(
@@ -31,7 +57,7 @@ class BlocCounterScreen extends StatelessWidget {
           ),
           FloatingActionButton(
             heroTag: '2',
-            onPressed: () => {},
+            onPressed: () => {encreasedCounterBy(context, 2)},
             child: const Text('+2'),
           ),
           const SizedBox(
@@ -39,7 +65,7 @@ class BlocCounterScreen extends StatelessWidget {
           ),
           FloatingActionButton(
             heroTag: '3',
-            onPressed: () => {},
+            onPressed: () => {encreasedCounterBy(context)},
             child: const Text('+1'),
           ),
         ],
